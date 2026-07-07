@@ -1,0 +1,15 @@
+<resources>
+    <style name="Theme.SkyGame" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">#0d0d15</item>
+        <item name="android:navigationBarColor">#0d0d15</item>
+    </style>
+
+    <style name="Theme.SkyGame.Fullscreen" parent="Theme.SkyGame">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+</resources>
