@@ -1,0 +1,201 @@
+.gradle/
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx/
+local.properties
+
+// Top-level build file
+plugins {
+    id 'com.android.application' version '8.2.0' apply false
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+# Project-wide Gradle settings
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+android.useAndroidX=true
+kotlin.code.style=official
+android.nonTransitiveRClass=true
+
+# 和平使者 - Android 版
+
+## 📱 项目结构
+
+```
+SkyGame_Android/
+├── app/
+│   ├── src/main/
+│   │   ├── assets/          # 游戏资源（HTML/JS/图片/音频）
+│   │   │   ├── index.html   # 游戏入口
+│   │   │   ├── main.js      # 游戏核心逻辑
+│   │   │   ├── wx-shim.js   # 浏览器兼容层
+│   │   │   ├── images/      # 游戏图片
+│   │   │   └── audio/       # 游戏音乐
+│   │   ├── java/com/skygame/
+│   │   │   └── MainActivity.java  # 主Activity
+│   │   ├── res/             # Android资源
+│   │   └── AndroidManifest.xml
+│   └── build.gradle
+├── build.gradle
+├── settings.gradle
+└── gradle.properties
+```
+
+## 🛠 构建步骤
+
+### 方法一：使用 Android Studio（推荐）
+
+1. **安装 Android Studio**（最新版）
+   - 下载地址：https://developer.android.com/studio
+
+2. **打开项目**
+   - 启动 Android Studio
+   - 选择 "Open an existing project"
+   - 选择 `SkyGame_Android` 文件夹
+
+3. **同步 Gradle**
+   - 打开项目后，Android Studio 会自动同步 Gradle
+   - 等待同步完成（首次可能需要下载Gradle和SDK）
+
+4. **构建 APK**
+   - 菜单栏选择 `Build` → `Build Bundle(s) / APK(s)` → `Build APK(s)`
+   - 构建完成后，APK 位于：`app/build/outputs/apk/debug/app-debug.apk`
+
+5. **安装到手机**
+   - 用USB连接手机，开启开发者模式
+   - 点击工具栏的绿色运行按钮（▶），或拖拽APK到手机安装
+
+### 方法二：命令行构建
+
+```bash
+# 1. 进入项目目录
+cd SkyGame_Android
+
+# 2. 使用 Gradle Wrapper 构建
+./gradlew assembleDebug
+
+# 3. APK 输出路径
+# app/build/outputs/apk/debug/app-debug.apk
+```
+
+### 方法三：发布版构建（签名APK）
+
+```bash
+# 1. 生成签名密钥（只需执行一次）
+keytool -genkey -v -keystore peaceenvoy.keystore -alias peaceenvoy -keyalg RSA -validity 10000
+
+# 2. 配置签名（在 app/build.gradle 中添加）
+# 参考下面的签名配置
+
+# 3. 构建发布版
+./gradlew assembleRelease
+```
+
+**签名配置示例（添加到 app/build.gradle）：**
+
+```gradle
+android {
+    ...
+    signingConfigs {
+        release {
+            storeFile file("peaceenvoy.keystore")
+            storePassword "你的密码"
+            keyAlias "peaceenvoy"
+            keyPassword "你的密码"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+```
+
+## 📋 系统要求
+
+| 项目 | 要求 |
+|------|------|
+| Android 版本 | Android 5.0+ (API 21+) |
+| 存储空间 | 约 15MB |
+| 权限 | 无特殊权限（纯本地运行） |
+| 网络 | 不需要网络连接 |
+
+## 🎮 游戏特性
+
+- **全屏沉浸式体验**：隐藏系统UI，最大化游戏画面
+- **音频自动播放**：无需用户交互即可播放背景音乐
+- **竖屏锁定**：强制竖屏显示，优化触控体验
+- **WebView渲染**：使用系统WebView高效渲染Canvas游戏
+- **本地资源**：所有资源打包在APK内，无需下载
+
+## 🔧 技术说明
+
+- **引擎**：原生 Android WebView + HTML5 Canvas
+- **渲染**：2D Canvas 硬件加速
+- **音频**：HTML5 Audio API
+- **输入**：触摸事件（Touch + Mouse 兼容）
+- **适配**：自动适配各种屏幕尺寸和DPI
+
+## 📝 注意事项
+
+1. **首次构建**可能需要下载Gradle和Android SDK，请保持网络畅通
+2. **WebView版本**：建议使用系统最新WebView（Chrome内核）以获得最佳性能
+3. **音频播放**：部分手机可能需要点击屏幕后音频才会播放（Android安全策略）
+4. **内存占用**：游戏运行时约占用 50-100MB 内存
+
+## 🐛 常见问题
+
+**Q: 构建失败，提示 Gradle 版本不兼容？**
+A: 在 Android Studio 中点击 `File` → `Project Structure` → 检查 Gradle 版本是否为 8.2+
+
+**Q: 游戏画面显示不全？**
+A: WebView 会自动适配屏幕，如果仍有问题请检查 `wx-shim.js` 中的 resize 处理
+
+**Q: 背景音乐不播放？**
+A: 部分Android版本限制自动播放音频，首次点击屏幕后会解锁音频
+
+**Q: 如何修改游戏内容？**
+A: 直接修改 `app/src/main/assets/` 下的 HTML/JS 文件，然后重新构建APK
+
+## 📦 文件大小
+
+- 源代码 + 资源：~2.5MB
+- 构建后 APK（Debug）：~5-8MB
+- 构建后 APK（Release）：~3-5MB
+
+---
+
+**游戏名称**：和平使者  
+**版本**：1.0.0  
+**开发者**：基于原HTML5游戏移植
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "PeaceEnvoy"
+include ':app'
